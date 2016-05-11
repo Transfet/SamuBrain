@@ -51,11 +51,13 @@
 
 #include "GameOfLife.h"
 
-GameOfLife::GameOfLife ( int w, int h ) : m_w ( w ), m_h ( h )
+GameOfLife::GameOfLife ( int w, int h , VideoConverter *conv) : m_w ( w ), m_h ( h ), mMovie(conv)
 {
+  mMutex = new QMutex();
+  mStopped = false;
+  mNumOfFrames = mMovie -> mLattices.size();
 
   lattices = new int**[2];
-
   lattices[0] = new int*[m_h];
   for ( int i {0}; i<m_h; ++i )
     {
@@ -76,21 +78,26 @@ GameOfLife::GameOfLife ( int w, int h ) : m_w ( w ), m_h ( h )
       predictions[i] = new int [m_w];
     }
 
-  latticeIndex = 0;
+    samuQl = new QL*[m_h];
+    for(int i{0}; i<m_h; ++i)
+    {
+      samuQl[i] = new QL [m_w];
+    }
 
+  latticeIndex = 0;
   int ** lattice = lattices[latticeIndex];
 
   for ( int i {0}; i<m_h; ++i )
     for ( int j {0}; j<m_w; ++j )
       {
-        lattice[i][j] = 0;
+        lattice[i][j] = false;
       }
 
   samuBrain = new SamuBrain ( m_w, m_h );
-
+/*
   carx = 0;
   manx = m_w/2;
-  housex = 2*m_w/5;
+  housex = 2*m_w/5;*/
 
 }
 
@@ -101,12 +108,15 @@ GameOfLife::~GameOfLife()
       delete[] lattices[0][i];
       delete[] lattices[1][i];
       delete[] predictions[i];
+      delete[] samuQl[i];
     }
 
+  delete[] samuQl;  
   delete[] predictions;
   delete[] lattices[0];
   delete[] lattices[1];
   delete[] lattices;
+  delete mMovie;
 
   delete samuBrain;
 }
@@ -119,34 +129,49 @@ int ** GameOfLife::lattice()
 
 void GameOfLife::run()
 {
-  
+  //std::cout<<"GameOfLiferun"<<std::endl;
   int **fp, **fr;
   while ( true )
     {
       QThread::msleep ( m_delay );
 
+     // std::cout<<"before paused"<<std::endl;
+
       if ( !paused )
         {
-
+          //std::cout<<"in paused"<<std::endl;
           ++m_time;
 
           qDebug() << "<<<" << m_time << "<<<";
-
           development();
+         // std::cout<<"development"<<std::endl;
+          //learning();
+        /*  latticeIndex = (latticeIndex+1) % 2;
+          emit cellsChanged (lattices[latticeIndex],predictions,fp,fr);
+          ++mFrameNum;
+          {
+            QMutexLocker lck(mMutex);
+            if(mStopped)
+              break;
+          }*/
 
           if ( samuBrain )
             {
+             // std::cout<<"ifSamuBrain"<<std::endl;
               samuBrain->learning ( lattices[latticeIndex], predictions, &fp, &fr );
               qDebug() << m_time
                        << "   #MPUs:" << samuBrain->nofMPUs()
                        << "Observation (MPU):" << samuBrain->get_foobar().c_str();
             }
 
-          latticeIndex = ( latticeIndex+1 ) %2;
-          emit cellsChanged ( lattices[latticeIndex], predictions, fp, fr );
-
-          qDebug() << ">>>" << m_time << ">>>";
-
+          latticeIndex = (latticeIndex+1) % 2;
+          emit cellsChanged (lattices[latticeIndex],predictions,fp,fr);
+          ++mFrameNum;
+          {
+            QMutexLocker lck(mMutex);
+            if(mStopped)
+              break;
+          }
         }
     }
 
@@ -156,7 +181,7 @@ void GameOfLife::pause()
 {
   paused = !paused;
 }
-
+/*
 int GameOfLife::numberOfNeighbors ( int **lattice, int r, int c, int state )
 {
   int number {0};
@@ -326,13 +351,14 @@ void GameOfLife::control_Stroop ( int **nextLattice )
     }
 
 }
-
+*/
 void GameOfLife::development()
 {
+//  std::cout<<"develop"<<std::endl;
 
   int **prevLattice = lattices[latticeIndex];
   int **nextLattice = lattices[ ( latticeIndex+1 ) %2];
-
+/*
   clear_lattice ( nextLattice );
 
   if ( m_time == 1 )
@@ -361,7 +387,20 @@ void GameOfLife::development()
   else
     {
       m_time = -1;
-    }
+    }*/
+    //  std::cout<<"m_h = "<<m_h<<std::endl;
+     // std::cout<<"m_w = "<<m_w<<std::endl;
+      for(int i{0}; i < m_h; ++i)
+      {
+     //   std::cout<<"i="<<i<<std::endl;
+
+        for(int j{0}; j < m_w; ++j)
+        {
+       //   std::cout<<"j="<<j<<std::endl;
+          nextLattice[i][j] = mMovie->mLattices[mFrameNum % mNumOfFrames][j][i];
+       //   std::cout<<"nextLattice : "<<nextLattice[i][j]<<std::endl;
+        }
+      }
 
 }
 
@@ -447,7 +486,7 @@ void GameOfLife::blue ( int **lattice, int x, int y, int color )
 
     }
 }
-
+/*
 void GameOfLife::glider ( int **lattice, int x, int y )
 {
 
@@ -526,6 +565,13 @@ void GameOfLife::car ( int **lattice, int x, int y )
   lattice[y+2][x+1] = 1;
   lattice[y+2][x+3] = 1;
 
+}
+*/
+
+void GameOfLife::stop()
+{
+  QMutexLocker lck(mMutex);
+  mStopped = true;
 }
 
 int GameOfLife::getW() const

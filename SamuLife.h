@@ -57,17 +57,20 @@
 #include <QPainter>
 #include <QFont>
 #include "GameOfLife.h"
+#include "VideoConverter.h"
 
 class SamuLife : public QMainWindow
 {
     Q_OBJECT
 
-    int m_cw {12*2}, m_ch {10*2};
+    int m_cw {5}, m_ch {5};
     GameOfLife *gameOfLife;
     int **lattice {nullptr};
     int **prediction {nullptr};
     int **fp {nullptr};
     int **fr {nullptr};
+    VideoConverter *movConverter;
+    void closeEvent(QCloseEvent *evt);
 
     public slots :
     void updateCells ( int **, int **, int **, int ** );

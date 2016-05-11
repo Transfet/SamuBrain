@@ -53,6 +53,7 @@
 
 SamuBrain::SamuBrain ( int w, int h ) : m_w ( w ), m_h ( h )
 {
+  //std::cout<<"SamuBrain Constructor called"<<std::endl;
   m_morgan = newMPU();
 
   m_searching = false;
@@ -71,11 +72,13 @@ SamuBrain::~SamuBrain()
 MentalProcessingUnit::MentalProcessingUnit ( int w, int h ) : m_w ( w ), m_h ( h )
 {
 
+  std::cout<<"MPU called"<<std::endl;
   m_samuQl = new QL*[m_h];
 
   for ( int i {0}; i<m_h; ++i )
     {
       m_samuQl[i] = new QL [m_w];
+     // std::cout<<"m_samuQl : "<<m_samuQl[i]<<std::endl;
     }
 
   m_prev = new int*[m_h];
@@ -87,6 +90,8 @@ MentalProcessingUnit::MentalProcessingUnit ( int w, int h ) : m_w ( w ), m_h ( h
       m_prev[i] = new int [m_w];
       fp[i] = new int [m_w];
       fr[i] = new int [m_w];
+
+      //std::cout<<"m_prev : "<<m_prev[i]<<std::endl<<"fp : "<<fp[i]<<std::endl<<"fr : "<<fr[i]<<std::endl;
     }
 
   for ( int r {0}; r<m_h; ++r )
@@ -127,6 +132,7 @@ MentalProcessingUnit::~MentalProcessingUnit ( )
 
 MORGAN SamuBrain::newMPU ()
 {
+  //std::cout<<"newMPU called"<<std::endl;
 
   MORGAN morgan = new MentalProcessingUnit ( m_w, m_h );
 
@@ -194,6 +200,7 @@ double SamuBrain::howMuchLearned ( MPU samuQl ) const
 
 int SamuBrain::pred ( int **reality, int **predictions, int isLearning, int & vsum )
 {
+  std::cout<<"predboolint"<<std::endl;
   return pred ( m_morgan, reality, predictions, isLearning, vsum );
 }
 
@@ -301,6 +308,8 @@ int SamuBrain::pred ( MORGAN morgan, int **reality, int **predictions, int isLea
 
 int SamuBrain::pred ( MORGAN morgan, int **reality, int **predictions, int isLearning, int & vsum )
 {
+
+  //std::cout<<"pred called"<<std::endl;
 
   MPU samuQl = morgan->getSamu();
   int ** prev = morgan->getPrev();
@@ -602,6 +611,7 @@ bool Habituation::is_habituation ( int vsum, int sum, double &mon )
 
 void SamuBrain::learning ( int **reality, int **predictions, int ***fp, int ***fr )
 {
+  //std::cout<<"learning called"<<std::endl;
   this->fp = fp;
   this->fr = fr;
 
@@ -680,9 +690,6 @@ void SamuBrain::learning ( int **reality, int **predictions, int ***fp, int ***f
           m_haveAlreadyLearnt = false;
           m_haveAlreadyLearntTime = m_internal_clock;
 
-
-
-
         }
 
     }//searching
@@ -756,6 +763,7 @@ void SamuBrain::learning ( int **reality, int **predictions, int ***fp, int ***f
 
 
     }
+   // std::cout<<"learning end "<<std::endl;
 
 }
 

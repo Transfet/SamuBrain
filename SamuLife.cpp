@@ -56,7 +56,10 @@ SamuLife::SamuLife ( int w, int h, QWidget *parent ) : QMainWindow ( parent )
   setWindowTitle ( "SamuBrain, exp. 4, cognitive mental organs: MPU (Mental Processing Unit), COP-based Q-learning, acquiring higher-order knowledge" );
   setFixedSize ( QSize ( 2*w*m_cw, 2*h*m_ch ) );
 
-  gameOfLife = new GameOfLife ( w, h );
+  movConverter = new VideoConverter{w,h};
+  movConverter->exec();
+
+  gameOfLife = new GameOfLife ( w, h , movConverter);
   gameOfLife->start();
 
   connect ( gameOfLife, SIGNAL ( cellsChanged ( int **, int **, int **, int ** ) ),
@@ -192,6 +195,14 @@ void SamuLife::keyPressEvent ( QKeyEvent * event )
     {
       gameOfLife->setDelay ( gameOfLife->getDelay() * 2.0 );
     }
+}
+
+void SamuLife::closeEvent(QCloseEvent *evt)
+{
+  gameOfLife->stop();
+  gameOfLife->quit();
+  gameOfLife->wait();
+
 }
 
 SamuLife::~SamuLife()

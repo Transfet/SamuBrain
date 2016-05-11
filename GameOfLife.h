@@ -54,52 +54,62 @@
 
 #include <QThread>
 #include <QDebug>
+#include <QMutex>
 #include <sstream>
+#include "SamuQl.h"
 #include "SamuBrain.h"
+#include "VideoConverter.h"
 
 class GameOfLife : public QThread
 {
     Q_OBJECT
 
-    int m_w {40}, m_h {30};
+    int m_w, m_h;
 
     int ***lattices;
     int latticeIndex;
     int **predictions;
 
     SamuBrain* samuBrain;
+    VideoConverter* mMovie;
 
     long m_time {0};
     int m_delay {1};//{15};
     long age {0};
+    size_t mFrameNum{0};
+    size_t mNumOfFrames{0};
 
     bool paused {false};
 
+    QL** samuQl;
+    QMutex *mMutex;
+    bool mStopped;
+
     void development();
-    int  numberOfNeighbors ( int **lattice, int r, int c, int s );
+   // int  numberOfNeighbors ( int **lattice, int r, int c, int s );
 
-    void glider ( int **lattice, int x, int y );
-    void car ( int **lattice, int x, int y );
-    void man ( int **lattice, int x, int y );
-    void house ( int **lattice, int x, int y );
+  //  void glider ( int **lattice, int x, int y );
+  //  void car ( int **lattice, int x, int y );
+   // void man ( int **lattice, int x, int y );
+   // void house ( int **lattice, int x, int y );
 
-    int carx {0};
-    int manx {0};
-    int housex {0};
+    //int carx {0};
+    //int manx {0};
+    //int housex {0};
 
     void red ( int **lattice, int x, int y, int color );
     void green ( int **lattice, int x, int y, int color );
     void blue ( int **lattice, int x, int y, int color );
 
-    void clear_lattice ( int **nextLattice );
-    void fill_lattice ( int **nextLattice, int color );
+    //void clear_lattice ( int **nextLattice );
+    //void fill_lattice ( int **nextLattice, int color );
 
-    void control_Stroop ( int **nextLattice );
-    void control_Conway ( int **, int **nextLattice );
-    void control_Movie ( int **nextLattice );
+    //void control_Stroop ( int **nextLattice );
+    //void control_Conway ( int **, int **nextLattice );
+    //void control_Movie ( int **nextLattice );
 
 public:
-    GameOfLife ( int w = 30, int h = 20 );
+    GameOfLife ( int w = 30, int h = 20 ,VideoConverter *conv = 0);
     ~GameOfLife();
 
     void run();
@@ -116,6 +126,8 @@ public:
             m_delay = delay;
         }
     }
+
+    void stop();
 
 signals:
     void cellsChanged ( int **, int **, int **, int ** );
