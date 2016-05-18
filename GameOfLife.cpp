@@ -55,7 +55,8 @@ GameOfLife::GameOfLife ( int w, int h , VideoConverter *conv) : m_w ( w ), m_h (
 {
   mMutex = new QMutex();
   mStopped = false;
-  mNumOfFrames = mMovie -> mLattices.size();
+
+ 
 
   lattices = new int**[2];
   lattices[0] = new int*[m_h];
@@ -144,16 +145,6 @@ void GameOfLife::run()
 
           qDebug() << "<<<" << m_time << "<<<";
           development();
-         // std::cout<<"development"<<std::endl;
-          //learning();
-        /*  latticeIndex = (latticeIndex+1) % 2;
-          emit cellsChanged (lattices[latticeIndex],predictions,fp,fr);
-          ++mFrameNum;
-          {
-            QMutexLocker lck(mMutex);
-            if(mStopped)
-              break;
-          }*/
 
           if ( samuBrain )
             {
@@ -166,12 +157,20 @@ void GameOfLife::run()
 
           latticeIndex = (latticeIndex+1) % 2;
           emit cellsChanged (lattices[latticeIndex],predictions,fp,fr);
+
+          if(m_time == 2600)
+          {
+            mFrameNum = 0;
+          }
+
           ++mFrameNum;
+
           {
             QMutexLocker lck(mMutex);
             if(mStopped)
               break;
           }
+
         }
     }
 
@@ -181,6 +180,41 @@ void GameOfLife::pause()
 {
   paused = !paused;
 }
+
+void GameOfLife::controlMovie(int **nextLattice)
+{
+   
+  mNumOfFrames = controlMovieV.size();
+
+  std::cout<<"controlMovie frames"<<mNumOfFrames<<std::endl;
+      for(int i{0}; i < m_h; ++i)
+      {
+        for(int j{0}; j < m_w; ++j)
+        {
+          nextLattice[i][j] = controlMovieV[mFrameNum % mNumOfFrames][j][i];
+        }
+      }
+
+
+}
+
+void GameOfLife::controlMovie2(int **nextLattice)
+{
+
+   mNumOfFrames = originalMovieV.size();
+   std::cout<<"controlMovie2 frames"<<mNumOfFrames<<std::endl;
+
+  for(int i{0}; i < m_h; ++i)
+      {
+        for(int j{0}; j < m_w; ++j)
+        {
+         // std::cout<<"mFrameNum : "<<mFrameNum <<std::endl<<"mNumOfFrames: "<<mNumOfFrames<<std::endl;
+          nextLattice[i][j] = originalMovieV[mFrameNum % mNumOfFrames][j][i];
+        }
+      }
+
+}
+
 /*
 int GameOfLife::numberOfNeighbors ( int **lattice, int r, int c, int state )
 {
@@ -219,7 +253,7 @@ int GameOfLife::numberOfNeighbors ( int **lattice, int r, int c, int state )
 
   return number;
 }
-
+*/
 
 void GameOfLife::clear_lattice ( int **nextLattice )
 {
@@ -229,7 +263,7 @@ void GameOfLife::clear_lattice ( int **nextLattice )
         nextLattice[i][j] = 0;
       }
 }
-
+/*
 void GameOfLife::fill_lattice ( int **nextLattice, int color )
 {
   for ( int i {0}; i<m_h; ++i )
@@ -358,10 +392,10 @@ void GameOfLife::development()
 
   int **prevLattice = lattices[latticeIndex];
   int **nextLattice = lattices[ ( latticeIndex+1 ) %2];
-/*
-  clear_lattice ( nextLattice );
 
-  if ( m_time == 1 )
+  //clear_lattice ( nextLattice );
+
+  /*if ( m_time == 1 )
     {
       //clear_lattice ( nextLattice );
 
@@ -383,24 +417,27 @@ void GameOfLife::development()
   else if ( m_time < 22000 )
     {
       control_Movie ( nextLattice );
-    }
-  else
-    {
-      m_time = -1;
     }*/
-    //  std::cout<<"m_h = "<<m_h<<std::endl;
-     // std::cout<<"m_w = "<<m_w<<std::endl;
-      for(int i{0}; i < m_h; ++i)
-      {
-     //   std::cout<<"i="<<i<<std::endl;
 
-        for(int j{0}; j < m_w; ++j)
-        {
-       //   std::cout<<"j="<<j<<std::endl;
-          nextLattice[i][j] = mMovie->mLattices[mFrameNum % mNumOfFrames][j][i];
-       //   std::cout<<"nextLattice : "<<nextLattice[i][j]<<std::endl;
-        }
+
+      if(m_time < 2600)
+      {
+        std::cout<<"m_time:"<<m_time<<std::endl;
+        controlMovie(nextLattice);
       }
+     else if(m_time < 9000)
+      {
+        std::cout<<"m_time:"<<m_time<<std::endl;
+        controlMovie2(nextLattice);
+      }
+        else
+      {
+        m_time = -1;
+      }
+
+      
+
+
 
 }
 

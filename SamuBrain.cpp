@@ -200,7 +200,7 @@ double SamuBrain::howMuchLearned ( MPU samuQl ) const
 
 int SamuBrain::pred ( int **reality, int **predictions, int isLearning, int & vsum )
 {
-  std::cout<<"predboolint"<<std::endl;
+  //std::cout<<"predboolint"<<std::endl;
   return pred ( m_morgan, reality, predictions, isLearning, vsum );
 }
 
@@ -756,6 +756,8 @@ void SamuBrain::learning ( int **reality, int **predictions, int ***fp, int ***f
 
             }
 
+            
+
         }
 
       * ( this->fp ) = m_morgan->getFp();
@@ -820,4 +822,9 @@ std::string SamuBrain::get_foobar ( MORGAN samuQl ) const
       return "Mystical knowledge";
     }
 }
+
+    bool SamuBrain::getHaveAlreadyLearnt() const
+    {
+      return m_haveAlreadyLearnt;
+    }
 

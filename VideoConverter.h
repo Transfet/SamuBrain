@@ -47,27 +47,40 @@ class VideoConverter : public QDialog
 public:
 															
 																		
-	VideoConverter(size_t width, size_t height);									// The constructor for the video converter 
-	latticesVect mLattices;															//something like that bool ***mLattices
+	VideoConverter(size_t width, size_t height);															// The constructor for the video converter 
+	void setmLattices(latticesVect &vect);
+	void setmLattices2(latticesVect &vect);
+	latticesVect getmLattices();
+	latticesVect getmLattices2();
+	latticesVect getTmpVect();																								
 
 public slots:
-	void Convert();
+	void ChooseSlot();
+	void ConvertSlot();
+
 
 private:
 
 	QString videoName;
+	QString videoName2;
 
-	cv::VideoCapture movCap;														// The video capture for the movie
+	cv::VideoCapture movCap;																				// The video capture for the movie
 	
+	latticesVect mLattices;																					//something like that bool ***mLattices
+	latticesVect mLattices2;
+	std::vector<latticesVect> tmpVect;
+	void Convert(QString ,latticesVect& );
 	void ConvertFrameToGS(cv::Mat& frame);
 
 	
-	size_t sGWidth, sGHeight;														// The width and height of Samu's grid in cells
-	size_t movieWidth, movieHeight;													// The width and height of the actual movie in pixels
-	size_t sMWidth, sMHeight;														// The width and height of Samu's cells in the movie
+	size_t sGWidth, sGHeight;																				// The width and height of Samu's grid in cells
+	size_t movieWidth, movieHeight;																			// The width and height of the actual movie in pixels
+	size_t sMWidth, sMHeight;
+	int vectCounter{0};																				// The width and height of Samu's cells in the movie
 	
 	QPushButton *convert;
 	QPushButton *launchSamu;
+	QPushButton *choose;
 };
 
 #endif

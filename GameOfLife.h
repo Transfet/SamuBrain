@@ -72,6 +72,8 @@ class GameOfLife : public QThread
 
     SamuBrain* samuBrain;
     VideoConverter* mMovie;
+    latticesVect controlMovieV = mMovie -> getmLattices();
+    latticesVect originalMovieV = mMovie -> getmLattices2();
 
     long m_time {0};
     int m_delay {1};//{15};
@@ -101,12 +103,14 @@ class GameOfLife : public QThread
     void green ( int **lattice, int x, int y, int color );
     void blue ( int **lattice, int x, int y, int color );
 
-    //void clear_lattice ( int **nextLattice );
-    //void fill_lattice ( int **nextLattice, int color );
+    void clear_lattice ( int **nextLattice );
+    void fill_lattice ( int **nextLattice, int color );
 
     //void control_Stroop ( int **nextLattice );
     //void control_Conway ( int **, int **nextLattice );
     //void control_Movie ( int **nextLattice );
+    void controlMovie(int **);
+    void controlMovie2(int **);
 
 public:
     GameOfLife ( int w = 30, int h = 20 ,VideoConverter *conv = 0);

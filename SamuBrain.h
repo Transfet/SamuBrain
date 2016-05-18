@@ -58,6 +58,8 @@
 #include <vector>
 #include <set>
 #include <cstdlib>
+#include "VideoConverter.h"
+
 
 class Habituation
 {
@@ -86,8 +88,8 @@ public:
         clear();
     }
 
-    bool is_habituation ( int , int , double & );
-    bool is_newinput ( int sum, int vsum );
+    bool is_habituation ( int , int , double & );           //Habitucáiós folyamat észlelése 
+    bool is_newinput ( int sum, int vsum );                 // új bemenetet észlelése 
     void clear() {
         mem = 0;
         err = 0;
@@ -154,6 +156,8 @@ class SamuBrain
     int m_maxLearningTime {0};
     int m_searchingStart {0};
     bool m_habituation {false};
+    VideoConverter* mMovie;
+    
 
     MORGAN newMPU ();
     int pred ( int **reality, int **predictions, int, int & );
@@ -171,6 +175,7 @@ public:
     void learning ( int **reality, int **predictions, int*** fp, int *** fr );
     int getW() const;
     int getH() const;
+    bool getHaveAlreadyLearnt() const;
     bool isSearching() const;
     int nofMPUs() const;
     std::string get_foobar() const;
